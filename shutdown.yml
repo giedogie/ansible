@@ -1,0 +1,8 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  
+  - name: shutdown all servers
+    community.general.shutdown:
