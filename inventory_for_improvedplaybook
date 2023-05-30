@@ -1,0 +1,4 @@
+192.168.0.101 apache_package=apache2 php_package=libapache2-mod-php
+192.168.0.221 apache_package=apache2 php_package=libapache2-mod-php
+192.168.0.54  apache_package=apache2 php_package=libapache2-mod-php
+#CentOS        apache_package=httpd php_package=php

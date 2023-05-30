@@ -1,0 +1,16 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  
+  - name: install apache and php 
+    package:
+      name: 
+        
+        - "{{ apache_package }}" #variables are declared in inventory file
+        - "{{ php_package }}"
+      
+      state: latest
+      update_cache: yes
+    
