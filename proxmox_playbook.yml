@@ -1,0 +1,44 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  
+  - name: update and upgrade repository index
+    apt:
+      update_cache: yes
+      upgrade: yes
+      
+  - name: install mc 
+    apt: 
+      name: mc
+      state: latest
+    
+  - name: sshd backup
+    copy:
+      src: /etc/ssh/sshd_config
+      remote_src: yes
+      dest: /etc/ssh/sshd_config.old
+      owner: root
+      group: root
+      mode: 644
+  
+  - name: copy new sshd config file
+    copy:
+      src: /home/neon/sshd_config
+      dest: /etc/ssh/sshd_config
+      owner: root
+      group: root
+      mode: 644
+      
+  - name: restart ssh to apply changes
+    command:
+      cmd: systemctl restart ssh.service 
+  
+  - name: add rules to firewall and bring it up
+    command:
+      cmd: ufw deafult deny incoming
+      cmd: ufw deafult allow outgoing
+      cmd: ufw allow 3033/tcp 
+      cmd: ufw limit 3033/tcp
+
