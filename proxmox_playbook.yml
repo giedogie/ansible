@@ -30,15 +30,26 @@
       owner: root
       group: root
       mode: 644
+    register: sshd
       
   - name: restart ssh to apply changes
     command:
       cmd: systemctl restart ssh.service 
+    when: sshd.changed
   
   - name: add rules to firewall and bring it up
+    tags: ufw,firewall
     command:
       cmd: ufw deafult deny incoming
       cmd: ufw deafult allow outgoing
       cmd: ufw allow 3033/tcp 
       cmd: ufw limit 3033/tcp
+    register: ufw
 
+  - name: start ufw 
+    tags: ufw,firewall
+    service:
+      name: ufw
+      state: started
+      enabled: yes
+    when: ufw.changed
