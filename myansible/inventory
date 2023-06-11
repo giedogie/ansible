@@ -1,0 +1,11 @@
+[web_servers]
+WebServer ansible_port=3002 ansible_host=192.168.0.***
+
+
+[file_servers]
+FileServer ansible_port=3001 ansible_host=192.168.0.***
+
+
+[empty_servers] 
+EmptyServer ansible_port=3003 ansible_host=192.168.0.***
+

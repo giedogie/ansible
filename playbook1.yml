@@ -34,8 +34,7 @@
     tags: alaways
     authorized_key:
        user: simone
-       key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC74011kgm0VA3Mt1KJUPBTx0umGlUYBV+hlb5p0xbX2s5BLzV3IBWVJ/em59zAbdBk4xe2ji7HamASQo9Xu9QhF0pQdU1ud+mCXG/vrs1vl03KvQ52TtDLqWl7L4qezpi7RUc3nL4aEGkFicm4JOhFT7wygNcyir3ncirlm14fpDSoGTer5iHC/p/KUNiZWpHFPAQOeCtY1sRvMuk8l60/eXi4HAam66Isl+Uf0UuyspBMHegBfIJFSjtWBO8nESlnvdQ1gnx9SI+qT+LUjITphnWtzFTrBMAb3hleHoCu6hz0u4Qw2OdAK5FL3COZsczUEHsvN5ds9lMVcZKGf9WrifVGKuLvHFd0DDw0ZBG4fwTCh7DJo7sisgc3wTdQ3NcTVNhCb5HIUDWbcAFAcls50S7AmzoeCMvsfj3zFpsI3ZGD2BjTDxjW2aVm9sDuGFif5rrEv7Swf/5y6oa65u2Mj/GklXDlyRJUvT8QGNKpXAauwWAk5ATUC0N8yz7tZYE= neon@neon-VS"
-      
+       key: ""
   - name: add sudoers file for simone
     tags: always
     copy:

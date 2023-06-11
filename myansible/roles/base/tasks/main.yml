@@ -1,0 +1,69 @@
+- name: update and upgrade repository index
+  apt:
+    update_cache: yes
+    upgrade: yes
+     
+- name: install mc 
+  apt: 
+    name: mc
+    state: latest
+
+- name: create admin user
+  tags: always
+  user:
+    name: admin
+    groups: root
+
+- name: add ssh key for admin
+  authorized_key:
+     user: admin
+     key: "****"
+
+
+      
+- name: add sudoers file for admin
+  tags: always
+  copy:
+     src: sudoer_admin
+     dest: /etc/sudoers.d/admin
+     owner: root
+     group: root
+     mode: 0440
+     
+- name: sshd backup
+  copy:
+    src: /etc/ssh/sshd_config
+    remote_src: yes
+    dest: /etc/ssh/sshd_config.old
+    owner: root
+    group: root
+    mode: 644
+    
+- name: copy new sshd config file
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 644
+  register: sshd
+  
+- name: restart ssh to apply changes
+  command:
+    cmd: systemctl restart ssh.service 
+  when: sshd.changed
+ 
+- name: add rules to firewall and bring it up
+  tags: ufw,firewall
+  command:
+    cmd: ufw deafult deny incoming
+    cmd: ufw deafult allow outgoing
+    cmd: ufw allow ****/tcp 
+    cmd: ufw limit ****/tcp
+
+
+- name: start ufw 
+  tags: ufw,firewall
+  ufw:
+    state: enabled
+   

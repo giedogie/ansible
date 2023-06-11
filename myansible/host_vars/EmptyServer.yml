@@ -1,0 +1,4 @@
+samba_user: tester
+samba_password: ****
+smb_group: smbgroup
+share_dir: /fileserver
