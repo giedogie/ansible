@@ -3,3 +3,135 @@
   package:
     name: samba 
     state: latest
+    
+- name: start smbd
+  service:
+    name: smbd
+    state: started
+    enabled: yes
+
+- name: smbd.conf backup
+  copy:
+    src: /etc/samba/smb.conf
+    remote_src: yes
+    dest: /etc/samba/smbd.conf.old
+    owner: root
+    group: root
+    mode: 644
+
+- name: copy new smbd.conf 
+  copy:
+    src: smb.conf
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: 644
+  register: smbd
+  
+- name: copy backup script
+  copy:
+    src: backupnew2.sh
+    dest: /usr/local/bin/backup.sh
+    owner: root
+    group: root
+    mode: 755
+  
+- name: copy smbdir.conf 
+  copy:
+    src: smbdir.conf
+    dest: /etc/samba/smbdir.conf
+    owner: root
+    group: root
+    mode: 644
+  register: smbdir  
+  
+- name: restart smbd to apply changes
+  service:
+    name: smbd
+    state: restarted
+    enabled: yes
+  when: smbd.changed,smbdir.changed
+
+- name: add rules to firewall and bring it up
+  tags: ufw,firewall
+  ufw:
+    rule: allow
+    name: samba
+  register: ufw
+
+- name: restart ufw 
+  tags: ufw,firewall
+  ufw:
+    state: reloaded
+  when: ufw.changed
+  
+- name: check if fileserver dir exists
+  block:
+   - name: Check directories
+     stat:
+       path: '/fileservers'
+     register: direx
+     
+- name: check if backup dir exists
+  block:
+   - name: Check directories
+     stat:
+       path: '/backup'
+     register: backupex 
+     
+- name: New (add backup script to cron)
+  ansible.builtin.cron:
+    backup: true
+    name: "Run backup"
+    minute: "12"
+    hour: "19"
+    job: /usr/local/bin/backup.sh /fileserver /backup >/tmp/mycommand.log 2>>&1
+    
+- name: start cron
+  command:
+     cmd: systemctl start cron     
+    
+  
+- name: make directory for fileserver
+  command:
+     cmd: mkdir "{{ share_dir }}"  
+  when: direx.changed
+  
+- name: make directory for backup
+  command:
+     cmd: mkdir "{{ backup_dir }}"   
+  when: backupex.changed
+  
+- name: add samba group
+  group:
+     name: "{{ smb_group }}"
+     
+     
+     
+- name: add user for samba
+  user:
+     name: "{{ samba_user }}"
+     password: "{{ samba_password | password_hash('sha256') }}"
+     group: "{{ smb_group }}"
+     shell: /bin/bash
+     createhome: no
+  register: useradd
+  
+- name: set Samba passwords for each user
+  become: yes
+  shell: "printf '{{ samba_password }}\n{{ samba_password }}\n' | smbpasswd -a {{ samba_user }}"
+  
+
+
+- name: add samba user to group and change permissions
+  command:
+    cmd: usermod -aG "{ smb_group }}" "{{ samba_user }}"
+    cmd: chown -R "{{ samba_user }}":"{ smb_group }}" /fileserver
+    cmd: chmod -R g+w "{{ share_dir }}"
+  when: useradd.changed
+  
+
+ 
+
+
+  
